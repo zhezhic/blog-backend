@@ -2,10 +2,8 @@ package xyz.zhezhi.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 import xyz.zhezhi.entity.User;
 import xyz.zhezhi.service.UserService;
 import xyz.zhezhi.utils.R;
@@ -22,9 +20,12 @@ public class UserController {
 
     @PostMapping("register")
     @ApiOperation("注册")
-    public R register(@RequestBody User user) {
+    public R register(@Validated @RequestBody User user){
+        if (user.getPassword().length() < 6) {
+            return R.error().message("密码不合法");
+        }
         int result = userService.register(user);
         System.out.println(user);
-        return R.ok().data("result",result);
+        return R.ok().message("注册成功");
     }
 }

@@ -25,15 +25,15 @@ public class R {
     public static R ok() {
         R r = new R();
         r.setSuccess(true);
-        r.setCode(ReturnCode.SUCCESS);
-        r.setMessage("成功");
+        r.setCode(ReturnCode.OK);
+        r.setMessage("success");
         return r;
     }
     public static R error(){
         R r = new R();
         r.setSuccess(false);
-        r.setCode(ReturnCode.ERROR);
-        r.setMessage("失败");
+        r.setCode(ReturnCode.Bad_Request);
+        r.setMessage("error");
         return r;
     }
 

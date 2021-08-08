@@ -1,6 +1,8 @@
 package xyz.zhezhi.utils;
 
 public interface ReturnCode {
-    public static Integer SUCCESS = 200;
-    public static Integer ERROR = 400;
+    Integer OK = 200;
+    Integer Bad_Request = 400;
+    Integer Not_Found = 404;
+    Integer Unauthorized = 401;
 }
