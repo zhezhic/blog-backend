@@ -1,4 +1,4 @@
-package xyz.zhezhi.utils;
+package xyz.zhezhi.common;
 
 import lombok.Data;
 
@@ -18,7 +18,7 @@ public class R {
     //返回数据
     private Map<String, Object> data = new HashMap<>();
 
-    private R() {
+    public R() {
 
     }
 

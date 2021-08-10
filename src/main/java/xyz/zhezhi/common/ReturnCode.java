@@ -1,4 +1,4 @@
-package xyz.zhezhi.utils;
+package xyz.zhezhi.common;
 
 public interface ReturnCode {
     Integer OK = 200;
