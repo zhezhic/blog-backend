@@ -39,5 +39,20 @@ class ApplicationTests {
         List<User> users = userMapper.selectList(wrapper);
 
     }
+    @Test
+    void login() {
+        User user = new User();
+        user.setEmail("22@q.com");
+        user.setPassword("664d568834a8e92e6aafa5ab7843d634");
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        wrapper
+                .eq("email", user.getEmail())
+        ;
+        User u = userMapper.selectOne(wrapper);
+        if (user.getPassword().equals(u.getPassword())) {
+            System.err.println("登陆成功");
+        }
+        System.err.println("-------");
+    }
 
 }

@@ -5,4 +5,7 @@ import xyz.zhezhi.entity.User;
 
 public interface UserService extends IService<User> {
     int register(User user);
+
+    Boolean login(User user);
+
 }

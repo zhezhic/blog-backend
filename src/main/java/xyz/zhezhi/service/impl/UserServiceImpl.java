@@ -1,5 +1,6 @@
 package xyz.zhezhi.service.impl;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
@@ -20,8 +21,26 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
+    public Boolean login(User user) {
+        user.setPassword(PasswordEncrypt.encrypt(user.getPassword()));
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        wrapper
+                .eq("email", user.getEmail())
+        ;
+        User u = userMapper.selectOne(wrapper);
+        if (u == null) {
+            throw new CustomException(400, "邮箱不存在");
+        }
+        if (user.getPassword().equals(u.getPassword())) {
+            StpUtil.login(u.getId());
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public int register(User user) {
-        user.setPassword(PasswordEncrypt.encypt(user.getPassword()));
+        user.setPassword(PasswordEncrypt.encrypt(user.getPassword()));
         QueryWrapper<User> wrapper = new QueryWrapper<>();
         wrapper
                 .eq("email", user.getEmail())

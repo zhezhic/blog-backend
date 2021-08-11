@@ -1,5 +1,7 @@
 package xyz.zhezhi.controller;
 
+import cn.dev33.satoken.stp.SaTokenInfo;
+import cn.dev33.satoken.stp.StpUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.validation.annotation.Validated;
@@ -23,12 +25,23 @@ public class UserController {
 
     @PostMapping("register")
     @ApiOperation("注册")
-    public R register(@Validated @RequestBody User user){
+    public R register(@Validated @RequestBody User user) {
         int result = userService.register(user);
         if (result >= 1) {
             return R.ok().message("注册成功");
         }
 
         return R.error().message("注册失败");
+    }
+
+    @PostMapping("login")
+    @ApiOperation("登陆")
+    public R login(@RequestBody User user) {
+        Boolean isLogin = userService.login(user);
+        if (isLogin) {
+            SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
+            return R.ok().message("登陆成功").data(tokenInfo.getTokenName(),tokenInfo.getTokenValue());
+        }
+        return R.error().message("密码错误");
     }
 }
