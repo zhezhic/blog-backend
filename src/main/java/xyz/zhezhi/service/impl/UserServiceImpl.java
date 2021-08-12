@@ -5,8 +5,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import xyz.zhezhi.common.CustomException;
-import xyz.zhezhi.entity.User;
+import xyz.zhezhi.module.dto.user.UserLogin;
+import xyz.zhezhi.module.entity.User;
 import xyz.zhezhi.mapper.UserMapper;
+import xyz.zhezhi.module.vo.UserInfo;
 import xyz.zhezhi.service.UserService;
 import xyz.zhezhi.utils.PasswordEncrypt;
 
@@ -21,7 +23,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public Boolean login(User user) {
+    public Boolean login(UserLogin user) {
         user.setPassword(PasswordEncrypt.encrypt(user.getPassword()));
         QueryWrapper<User> wrapper = new QueryWrapper<>();
         wrapper
@@ -36,6 +38,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             return true;
         }
         return false;
+    }
+
+    @Override
+    public UserInfo info() {
+        String id = StpUtil.getLoginIdAsString();
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        wrapper
+                .eq("id", id)
+        ;
+        User u = userMapper.selectOne(wrapper);
+        if (u == null) {
+            throw new CustomException(400, "用户不存在");
+        }
+        UserInfo userInfo = new UserInfo(u.getId(), u.getName(), u.getEmail());
+        return userInfo;
     }
 
     @Override

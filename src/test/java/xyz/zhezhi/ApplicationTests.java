@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import xyz.zhezhi.entity.User;
+import xyz.zhezhi.module.entity.User;
 import xyz.zhezhi.mapper.UserMapper;
 
 import java.util.List;

@@ -1,4 +1,4 @@
-package xyz.zhezhi.entity;
+package xyz.zhezhi.module.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import io.swagger.annotations.ApiModel;

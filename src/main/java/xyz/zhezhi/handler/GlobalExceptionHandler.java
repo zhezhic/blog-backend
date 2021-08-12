@@ -9,7 +9,7 @@ import xyz.zhezhi.common.R;
 public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public R GlobalException(Exception e){
-        return R.error().message("执行了全局异常");
+        return R.error().message(e.getMessage());
     }
     @ExceptionHandler(CustomException.class)
     public R CustomException(CustomException e){

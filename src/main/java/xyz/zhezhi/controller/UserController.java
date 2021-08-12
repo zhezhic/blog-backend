@@ -5,12 +5,11 @@ import cn.dev33.satoken.stp.StpUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import xyz.zhezhi.common.R;
-import xyz.zhezhi.entity.User;
+import xyz.zhezhi.module.dto.user.UserLogin;
+import xyz.zhezhi.module.entity.User;
+import xyz.zhezhi.module.vo.UserInfo;
 import xyz.zhezhi.service.UserService;
 
 @Api(tags = "用户管理")
@@ -36,12 +35,26 @@ public class UserController {
 
     @PostMapping("login")
     @ApiOperation("登陆")
-    public R login(@RequestBody User user) {
+    public R login(@Validated @RequestBody UserLogin user) {
         Boolean isLogin = userService.login(user);
         if (isLogin) {
             SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
             return R.ok().message("登陆成功").data(tokenInfo.getTokenName(),tokenInfo.getTokenValue());
         }
         return R.error().message("密码错误");
+    }
+    @GetMapping("info")
+    @ApiOperation("用户信息")
+    public R info() {
+        UserInfo userInfo = userService.info();
+        return R.ok().data("userInfo",userInfo);
+    }
+    @DeleteMapping("logout")
+    @ApiOperation("用户注销")
+    public R logout() {
+        if (StpUtil.isLogin()) {
+            StpUtil.logoutByTokenValue(StpUtil.getTokenValue());
+        }
+        return R.ok().message("注销成功");
     }
 }
