@@ -12,7 +12,13 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
-
+/**
+  * @author zhezhi
+  * @className: User
+  * @description: 用户实体
+  * @date 2021/8/17 下午9:23
+  * @version：1.0
+  */
 @ApiModel("用户实体")
 @Data
 @AllArgsConstructor
@@ -35,7 +41,8 @@ public class User {
     @Email
     @NotBlank(message = "邮箱不能为空")
     private String email;
-
+    @ApiModelProperty("用户头像")
+    private String avatar;
     @TableLogic
     private Integer deleted;
 

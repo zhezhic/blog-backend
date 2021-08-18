@@ -1,9 +1,18 @@
 server:
   port: 8087
+myconfig:
+  upload:
+    root: ${user.home}/upload
+    avatar: ${myconfig.upload.root}/avatar/
+    port: ${server.port}
 spring:
   config:
     activate:
       on-profile: dev
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 2MB
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
     url: jdbc:mariadb://localhost:3306/blog?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=GMT%2B8

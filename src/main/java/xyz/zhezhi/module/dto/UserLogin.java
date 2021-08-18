@@ -1,4 +1,4 @@
-package xyz.zhezhi.module.dto.user;
+package xyz.zhezhi.module.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -9,7 +9,13 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-
+/**
+  * @author zhezhi
+  * @className: UserLogin
+  * @description: 用户登陆dto类
+  * @date 2021/8/17 下午9:23
+  * @version：1.0
+  */
 @ApiModel("用户登陆类")
 @Data
 @AllArgsConstructor

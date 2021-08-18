@@ -4,7 +4,13 @@ import lombok.Data;
 
 import java.util.HashMap;
 import java.util.Map;
-
+/**
+  * @author zhezhi
+  * @className: R
+  * @description: 统一返回类
+  * @date 2021/8/17 下午9:18
+  * @version：1.0
+  */
 @Data
 public class R {
     //是否成功

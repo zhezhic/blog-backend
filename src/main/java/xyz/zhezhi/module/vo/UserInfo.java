@@ -11,7 +11,13 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-
+/**
+  * @author zhezhi
+  * @className: UserInfo
+  * @description: 用户信息vo类
+  * @date 2021/8/17 下午9:23
+  * @version：1.0
+  */
 @ApiModel("用户信息类")
 @Data
 @AllArgsConstructor
@@ -28,4 +34,6 @@ public class UserInfo {
     @Email(message = "邮箱不合规范")
     @NotBlank(message = "邮箱不能为空")
     private String email;
+    @ApiModelProperty("用户头像")
+    private String avatar;
 }

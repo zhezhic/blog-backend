@@ -5,7 +5,13 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-
+/**
+  * @author zhezhi
+  * @className: TimeObjectHandler
+  * @description: 实体时间处理类
+  * @date 2021/8/17 下午9:21
+  * @version：1.0
+  */
 @Component
 public class TimeObjectHandler implements MetaObjectHandler {
     @Override
