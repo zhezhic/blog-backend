@@ -42,6 +42,13 @@ public class R {
         r.setMessage("error");
         return r;
     }
+    public static R unauthorized(){
+        R r = new R();
+        r.setSuccess(false);
+        r.setCode(ReturnCode.Unauthorized);
+        r.setMessage("unauthorized");
+        return r;
+    }
 
     public R success(Boolean success) {
         this.setSuccess(success);

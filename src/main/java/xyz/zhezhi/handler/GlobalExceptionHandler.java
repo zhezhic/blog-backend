@@ -1,5 +1,6 @@
 package xyz.zhezhi.handler;
 
+import cn.dev33.satoken.exception.NotLoginException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -17,41 +18,48 @@ import xyz.zhezhi.common.R;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
-    /**
-     * @Description: 全局异常
-     * @param e:
-     * @return xyz.zhezhi.common.R
-     * @author zhezhi
-     * @date 2021/8/18 下午10:37
-     */
-    @ExceptionHandler(Exception.class)
-    public R GlobalException(Exception e) {
-        log.error(e.getMessage());
-        return R.error().message(e.getMessage());
+    @ExceptionHandler(NotLoginException.class)
+    public R requestException(NotLoginException e) {
+        log.warn(Thread.currentThread().getStackTrace()[1].getMethodName() + "::" + e.getMessage());
+        return R.unauthorized().message("请重新登陆");
     }
     /**
-     * @Description: 自定义异常
      * @param e:
      * @return xyz.zhezhi.common.R
+     * @Description: 自定义异常
      * @author zhezhi
      * @date 2021/8/18 下午10:37
      */
     @ExceptionHandler(CustomException.class)
-    public R CustomException(CustomException e) {
-        log.error(e.getMessage());
+    public R customException(CustomException e) {
+        log.warn(Thread.currentThread().getStackTrace()[1].getMethodName() + "::" + e.getMessage());
         return R.error().code(e.getCode()).message(e.getMessage());
     }
+
     /**
-     * @Description: 字段验证错误异常
      * @param e:
      * @return xyz.zhezhi.common.R
+     * @Description: 字段验证错误异常
      * @author zhezhi
      * @date 2021/8/18 下午10:39
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public R ValidationException(MethodArgumentNotValidException e) {
-        log.error(e.getMessage());
+    public R validationException(MethodArgumentNotValidException e) {
+        log.warn(Thread.currentThread().getStackTrace()[1].getMethodName() + "::" + e.getMessage());
+
         return R.error().message(e.getBindingResult().getFieldErrors().get(0).getDefaultMessage());
+    }
+
+    /**
+     * @param e:
+     * @return xyz.zhezhi.common.R
+     * @Description: 全局异常
+     * @author zhezhi
+     * @date 2021/8/18 下午10:37
+     */
+    @ExceptionHandler(Exception.class)
+    public R globalException(Exception e) {
+        log.warn(Thread.currentThread().getStackTrace()[1].getMethodName() + "::" + e.getMessage());
+        return R.error().message(e.getMessage());
     }
 }

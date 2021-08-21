@@ -1,5 +1,10 @@
 server:
   port: 8088
+myconfig:
+  upload:
+    root: ${user.home}/upload
+    avatar: ${myconfig.upload.root}/avatar/
+    port: ${server.port}
 spring:
   config:
     activate:

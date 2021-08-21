@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import xyz.zhezhi.common.CustomException;
 import xyz.zhezhi.mapper.UserMapper;
 import xyz.zhezhi.module.dto.UserLogin;
+import xyz.zhezhi.module.dto.UserProfile;
 import xyz.zhezhi.module.entity.User;
 import xyz.zhezhi.module.vo.UserInfo;
 import xyz.zhezhi.service.UserService;
@@ -60,7 +61,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (u == null) {
             throw new CustomException(400, "用户不存在");
         }
-        return new UserInfo(u.getId(), u.getName(), u.getEmail(), u.getAvatar());
+        return new UserInfo(u);
     }
 
     @Override
@@ -71,7 +72,42 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (u == null) {
             throw new CustomException(400, "用户不存在");
         }
-        return new UserInfo(u.getId(), u.getName(), u.getEmail(), u.getAvatar());
+        return new UserInfo(u);
+    }
+
+    @Override
+    public int updateProfileById(UserProfile userProfile, String id) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper
+                .eq("email", userProfile.getEmail())
+                .or()
+                .eq("name", userProfile.getName())
+        ;
+        List<User> users = userMapper.selectList(queryWrapper);
+        for (User u : users) {
+            if (id.equals(String.valueOf(u.getId()))) {
+                continue;
+            }
+            if (u.getName().equals(userProfile.getName())) {
+                throw new CustomException(400, "用户名已注册");
+            } else if (u.getEmail().equals(userProfile.getEmail())) {
+                throw new CustomException(400, "邮箱已注册");
+            }
+        }
+        UpdateWrapper<User> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("id", id)
+                .set("name", userProfile.getName())
+                .set("email",userProfile.getEmail())
+                .set("intro",userProfile.getIntro())
+        ;
+        return userMapper.update(null,updateWrapper);
+    }
+
+    @Override
+    public int updatePasswordById(String password, String id) {
+        UpdateWrapper<User> wrapper = new UpdateWrapper<>();
+        wrapper.eq("id", id).set("password", PasswordEncrypt.encrypt(password));
+        return userMapper.update(null, wrapper);
     }
 
     @Override

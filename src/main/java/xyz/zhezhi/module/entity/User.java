@@ -43,12 +43,17 @@ public class User {
     private String email;
     @ApiModelProperty("用户头像")
     private String avatar;
+    @ApiModelProperty("用户个人介绍")
+    private String intro;
     @TableLogic
+    @ApiModelProperty("逻辑删除")
     private Integer deleted;
 
     @TableField(fill = FieldFill.INSERT)
+    @ApiModelProperty("创建时间")
     private LocalDateTime createTime;
 
     @TableField(fill = FieldFill.INSERT_UPDATE)
+    @ApiModelProperty("更新时间")
     private LocalDateTime updateTime;
 }

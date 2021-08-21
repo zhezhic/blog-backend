@@ -46,4 +46,10 @@ sa-token:
   # token风格
   token-style: uuid
   # 是否输出操作日志
-  is-log: false
+  is-log: true
+# Spring-Boot 日志输出
+logging:
+  level:
+    root: info
+  file:
+    name: ${myconfig.upload.root}/blog.log
