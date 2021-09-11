@@ -17,6 +17,5 @@ import org.springframework.stereotype.Component;
 public class Upload {
     private String root;
     private String avatar;
-    private String host;
-    private String port;
+    private String blogImage;
 }

@@ -4,10 +4,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import xyz.zhezhi.mapper.BlogMapper;
 import xyz.zhezhi.mapper.UserMapper;
 import xyz.zhezhi.module.entity.Upload;
 import xyz.zhezhi.module.entity.User;
-import xyz.zhezhi.utils.GenerateAvatar;
 
 import java.io.IOException;
 import java.util.List;
@@ -16,6 +16,8 @@ import java.util.List;
 class ApplicationTests {
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private BlogMapper blogMapper;
     @Autowired
     Upload upload;
     @Test
@@ -67,10 +69,6 @@ class ApplicationTests {
 
     @Test
     void test() {
-        try {
-            GenerateAvatar.name("李","1267899dgffdgd143gdf");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        blogMapper.selectById("1434672157261324290");
     }
 }

@@ -49,6 +49,13 @@ public class R {
         r.setMessage("unauthorized");
         return r;
     }
+    public static R internal_error(){
+        R r = new R();
+        r.setSuccess(false);
+        r.setCode(ReturnCode.Internal_Server_Error);
+        r.setMessage("Internal Server Error");
+        return r;
+    }
 
     public R success(Boolean success) {
         this.setSuccess(success);

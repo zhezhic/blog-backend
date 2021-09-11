@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import xyz.zhezhi.common.CustomException;
 import xyz.zhezhi.common.R;
 
@@ -21,7 +22,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NotLoginException.class)
     public R requestException(NotLoginException e) {
         log.warn(Thread.currentThread().getStackTrace()[1].getMethodName() + "::" + e.getMessage());
-        return R.unauthorized().message("请重新登陆");
+        return R.unauthorized().message("请登陆");
     }
     /**
      * @param e:
@@ -49,7 +50,12 @@ public class GlobalExceptionHandler {
 
         return R.error().message(e.getBindingResult().getFieldErrors().get(0).getDefaultMessage());
     }
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public R MaxUploadSizeExceededException(MaxUploadSizeExceededException e) {
+        log.warn(Thread.currentThread().getStackTrace()[1].getMethodName() + "::" + e.getMessage());
 
+        return R.error().message("文件超出大小");
+    }
     /**
      * @param e:
      * @return xyz.zhezhi.common.R

@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import xyz.zhezhi.module.entity.Upload;
 
 import java.io.File;
+import java.util.ArrayList;
 
 /**
   * @author zhezhi
@@ -18,15 +19,20 @@ public class Initialization{
     @Autowired
     Upload upload;
     public void init() {
-        final String IMG_PATH_PREFIX = upload.getAvatar();
-        // 构建上传文件的存放 "文件夹" 路径
-        File fileDir = new File(IMG_PATH_PREFIX);
-        if(!fileDir.exists()){
-            // 递归生成文件夹
-            if (!fileDir.mkdirs()) {
-                log.error("初始化创建文件夹失败");
+        ArrayList<String> paths = new ArrayList<>();
+        paths.add(upload.getAvatar());
+        paths.add(upload.getBlogImage());
+        for (String path : paths) {
+            // 构建上传文件的存放 "文件夹" 路径
+            File fileDir = new File(path);
+            if(!fileDir.exists()){
+                // 递归生成文件夹
+                if (!fileDir.mkdirs()) {
+                    log.error("初始化创建文件夹失败"+path);
+                }
             }
+            log.info("初始化文件夹成功:"+path);
         }
-        log.info("初始化文件夹成功:"+IMG_PATH_PREFIX);
+
     }
 }

@@ -1,8 +1,9 @@
 package xyz.zhezhi.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import xyz.zhezhi.module.dto.UserLogin;
-import xyz.zhezhi.module.dto.UserProfile;
+import xyz.zhezhi.module.dto.user.UserEditPassword;
+import xyz.zhezhi.module.dto.user.UserLogin;
+import xyz.zhezhi.module.dto.user.UserProfile;
 import xyz.zhezhi.module.entity.User;
 import xyz.zhezhi.module.vo.UserInfo;
 /**
@@ -18,8 +19,8 @@ public interface UserService extends IService<User> {
     Boolean login(UserLogin user);
     UserInfo infoById(String id);
     UserInfo infoByName(String name);
-    int updateProfileById(UserProfile userProfile,String id);
-    int updatePasswordById(String password,String id);
+    int editProfileById(UserProfile userProfile, String id);
+    int editPasswordById(UserEditPassword userEditPassword, String id);
     String getAvatar(String id);
-    int setAvatar(String id);
+    int setAvatar(String id,String format);
 }

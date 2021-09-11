@@ -11,4 +11,5 @@ public interface ReturnCode {
     Integer Bad_Request = 400;
     Integer Not_Found = 404;
     Integer Unauthorized = 401;
+    Integer Internal_Server_Error = 500;
 }

@@ -7,8 +7,9 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import xyz.zhezhi.common.CustomException;
 import xyz.zhezhi.mapper.UserMapper;
-import xyz.zhezhi.module.dto.UserLogin;
-import xyz.zhezhi.module.dto.UserProfile;
+import xyz.zhezhi.module.dto.user.UserEditPassword;
+import xyz.zhezhi.module.dto.user.UserLogin;
+import xyz.zhezhi.module.dto.user.UserProfile;
 import xyz.zhezhi.module.entity.User;
 import xyz.zhezhi.module.vo.UserInfo;
 import xyz.zhezhi.service.UserService;
@@ -76,7 +77,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public int updateProfileById(UserProfile userProfile, String id) {
+    public int editProfileById(UserProfile userProfile, String id) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper
                 .eq("email", userProfile.getEmail())
@@ -104,10 +105,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public int updatePasswordById(String password, String id) {
-        UpdateWrapper<User> wrapper = new UpdateWrapper<>();
-        wrapper.eq("id", id).set("password", PasswordEncrypt.encrypt(password));
-        return userMapper.update(null, wrapper);
+    public int editPasswordById(UserEditPassword userEditPassword, String id) {
+        if (userEditPassword.getOriginPassword().equals(userEditPassword.getNewPassword())) {
+            throw new CustomException(400, "新旧密码一致");
+        }
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper
+                .eq("id", id)
+                .eq("password", PasswordEncrypt.encrypt(userEditPassword.getOriginPassword()))
+        ;
+        if (userMapper.selectOne(queryWrapper) == null) {
+            throw new CustomException(400, "原密码错误");
+        }
+        UpdateWrapper<User> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("id", id).set("password", PasswordEncrypt.encrypt(userEditPassword.getNewPassword()));
+        return userMapper.update(null, updateWrapper);
     }
 
     @Override
@@ -120,9 +132,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public int setAvatar(String id) {
+    public int setAvatar(String id,String format) {
         UpdateWrapper<User> wrapper = new UpdateWrapper<>();
-        wrapper.eq("id", id).set("avatar","http://127.0.0.1:8087/user/getAvatar?id="+id);
+        wrapper.eq("id", id).set("avatar","http://127.0.0.1:8087/user/getAvatar/"+id+"."+format);
         return userMapper.update(null, wrapper);
     }
 
@@ -153,7 +165,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         } catch (IOException e) {
             e.printStackTrace();
         }
-        setAvatar(String.valueOf(userInfo.getId()));
+        setAvatar(String.valueOf(userInfo.getId()),"png");
         return result;
     }
 

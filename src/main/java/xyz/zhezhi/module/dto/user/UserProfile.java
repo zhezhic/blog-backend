@@ -1,4 +1,4 @@
-package xyz.zhezhi.module.dto;
+package xyz.zhezhi.module.dto.user;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

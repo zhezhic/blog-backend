@@ -4,7 +4,8 @@ myconfig:
   upload:
     root: ${user.home}/upload
     avatar: ${myconfig.upload.root}/avatar/
-    port: ${server.port}
+    blog: ${myconfig.upload.root}/blog/
+    blog-image: ${myconfig.upload.root}/blog/image
 spring:
   config:
     activate:

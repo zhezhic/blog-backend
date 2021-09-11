@@ -9,8 +9,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import xyz.zhezhi.common.R;
-import xyz.zhezhi.module.dto.UserLogin;
-import xyz.zhezhi.module.dto.UserProfile;
+import xyz.zhezhi.module.dto.user.UserEditPassword;
+import xyz.zhezhi.module.dto.user.UserLogin;
+import xyz.zhezhi.module.dto.user.UserProfile;
 import xyz.zhezhi.module.entity.Upload;
 import xyz.zhezhi.module.entity.User;
 import xyz.zhezhi.module.vo.UserInfo;
@@ -54,8 +55,7 @@ public class UserController {
     @PostMapping("login")
     @ApiOperation("登陆")
     public R login(@Validated @RequestBody UserLogin user) {
-        Boolean isLogin = userService.login(user);
-        if (isLogin) {
+        if (userService.login(user)) {
             SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
             return R.ok().message("登陆成功").data(tokenInfo.getTokenName(), tokenInfo.getTokenValue());
         }
@@ -82,33 +82,37 @@ public class UserController {
     @SaCheckLogin
     @ApiOperation("添加用户头像")
     public R editAvatar(@RequestParam("file") MultipartFile imgFile) {
-            if (imgFile.isEmpty()) {
-                return R.error().message("请上传图片");
-            }
-            String imgDirFile = UploadUtils.getAvatarPath();
-            try {
-                // 构建真实的文件路径
-                File newFile = new File(imgDirFile + File.separator + StpUtil.getLoginIdAsString() + ".png");
-                // 上传图片到 -》 “绝对路径”
-                imgFile.transferTo(newFile);
-                return R.ok().message("上传成功");
-            } catch (IOException e) {
-                e.printStackTrace();
-                return R.error().message("上传异常");
-            }
+        if (imgFile.isEmpty()) {
+            return R.error().message("请上传图片");
+        }
+        String imgDirFile = UploadUtils.getAvatarPath();
+        String format = imgFile.getContentType().split("/")[1];
+        try {
+            // 构建真实的文件路径
+            File newFile = new File(imgDirFile + File.separator + StpUtil.getLoginIdAsString() +"."+ format);
+            // 上传图片到 -》 “绝对路径”
+            imgFile.transferTo(newFile);
+            userService.setAvatar(StpUtil.getLoginIdAsString(),format);
+            return R.ok().message("上传成功");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return R.error().message("上传异常");
+        }
     }
 
-    @GetMapping("getAvatar")
+    @GetMapping("getAvatar/{name}")
     @ApiOperation("获取用户头像")
-    public void getAvatar(HttpServletResponse response, String id) throws IOException {
+    public void getAvatar(HttpServletResponse response, @PathVariable("name") String name) throws IOException {
         OutputStream os = null;
         BufferedImage image;
         try {
-            image = ImageIO.read(new FileInputStream(UploadUtils.getAvatarPath() + id + ".png"));
+            image = ImageIO.read(new FileInputStream(UploadUtils.getAvatarPath() + name));
             os = response.getOutputStream();
-            response.setContentType("image/png");
+            //获取文件的后缀名 jpg
+            String suffix = name.substring(name.lastIndexOf(".")+1);
+            response.setContentType("image/"+suffix);
             if (image != null) {
-                ImageIO.write(image, "png", os);
+                ImageIO.write(image, suffix, os);
             }
         } finally {
             if (os != null) {
@@ -122,17 +126,18 @@ public class UserController {
     @SaCheckLogin
     @ApiOperation("更新用户个人资料")
     public R updateProfile(@Validated @RequestBody UserProfile userProfile) {
-        int result = userService.updateProfileById(userProfile, StpUtil.getLoginIdAsString());
+        int result = userService.editProfileById(userProfile, StpUtil.getLoginIdAsString());
         if (result >= 1) {
             return R.ok().message("保存成功");
         }
         return R.error().message("保存失败");
     }
+
     @PostMapping("updatePassword")
     @SaCheckLogin
     @ApiOperation("更新用户密码")
-    public R updatePassword(@RequestBody String password) {
-        int result = userService.updatePasswordById(password, StpUtil.getLoginIdAsString());
+    public R updatePassword(@Validated @RequestBody UserEditPassword userEditPassword) {
+        int result = userService.editPasswordById(userEditPassword, StpUtil.getLoginIdAsString());
         if (result >= 1) {
             return R.ok().message("修改成功");
         }
