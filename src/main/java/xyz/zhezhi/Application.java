@@ -1,10 +1,9 @@
 package xyz.zhezhi;
 
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@MapperScan("xyz.zhezhi.mapper")
+//@MapperScan({"xyz.zhezhi.mapper"})
 @SpringBootApplication
 public class Application {
 

@@ -13,4 +13,5 @@ import xyz.zhezhi.module.entity.Blog;
  */
 @Repository
 public interface BlogMapper extends BaseMapper<Blog> {
+//    IPage<Blog> selectPage(Page<?> page, Integer state);
 }

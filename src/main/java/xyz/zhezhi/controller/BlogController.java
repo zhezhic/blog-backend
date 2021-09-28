@@ -9,7 +9,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import xyz.zhezhi.common.R;
 import xyz.zhezhi.module.entity.Blog;
+import xyz.zhezhi.module.entity.Category;
+import xyz.zhezhi.module.entity.Comment;
+import xyz.zhezhi.module.vo.BlogVO;
+import xyz.zhezhi.module.vo.CategoryVO;
 import xyz.zhezhi.service.BlogService;
+import xyz.zhezhi.service.CategoryService;
+import xyz.zhezhi.service.CommentService;
 import xyz.zhezhi.utils.UploadUtils;
 
 import javax.imageio.ImageIO;
@@ -19,7 +25,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author zhezhi
@@ -33,9 +40,12 @@ import java.util.UUID;
 @RequestMapping("/blog/")
 public class BlogController {
     BlogService blogService;
-
-    public BlogController(BlogService blogService) {
+    CategoryService categoryService;
+    CommentService commentService;
+    public BlogController(BlogService blogService, CategoryService categoryService,CommentService commentService) {
         this.blogService = blogService;
+        this.categoryService = categoryService;
+        this.commentService = commentService;
     }
 
     @ApiOperation("上传图片")
@@ -54,28 +64,31 @@ public class BlogController {
                     return R.internal_error();
                 }
             }
-            String imageName =UUID.randomUUID()+"." + format;
-            File newFile = new File(userFolder+File.separator+imageName);
+            String imageName = UUID.randomUUID() + "." + format;
+            File newFile = new File(userFolder + File.separator + imageName);
             // 上传图片到 -》 “绝对路径”
             imgFile.transferTo(newFile);
-            return R.ok().data("imagePath","/blog/getImage/"+StpUtil.getLoginIdAsString()+File.separator+imageName);
+            return R.ok().data("imagePath",
+                    "/blog/getImage/" + StpUtil.getLoginIdAsString() + File.separator + imageName);
         } catch (IOException e) {
             return R.error().message("上传异常");
         }
     }
+
     @GetMapping("getImage/{id}/{name}")
     @ApiOperation("获取图片")
-    public void getImage(HttpServletResponse response,@PathVariable("id") String id,@PathVariable("name") String name) throws IOException {
+    public void getImage(HttpServletResponse response, @PathVariable("id") String id,
+                         @PathVariable("name") String name) throws IOException {
         OutputStream os = null;
         BufferedImage image;
         try {
-            image = ImageIO.read(new FileInputStream(UploadUtils.getBlogImage()+File.separator + id + File.separator+name));
+            image = ImageIO.read(new FileInputStream(UploadUtils.getBlogImage() + File.separator + id + File.separator + name));
             //获取文件的后缀名 jpg
-            String suffix = name.substring(name.lastIndexOf(".")+1);
+            String suffix = name.substring(name.lastIndexOf(".") + 1);
             os = response.getOutputStream();
-            response.setContentType("image/"+suffix);
+            response.setContentType("image/" + suffix);
             if (image != null) {
-                ImageIO.write(image,suffix, os);
+                ImageIO.write(image, suffix, os);
             }
         } finally {
             if (os != null) {
@@ -84,14 +97,84 @@ public class BlogController {
             }
         }
     }
+
+    @GetMapping("getCategories")
+    @SaCheckLogin
+    @ApiOperation("获取分类")
+    public R getCategories() {
+        List<Category> originCategories = categoryService.getCategories(StpUtil.getLoginIdAsLong());
+        List<CategoryVO> categories = new ArrayList<>();
+        for (Category originCategory : originCategories) {
+            categories.add(new CategoryVO(originCategory));
+        }
+        List<CategoryVO> finalCategories = categories;
+        categories = categories.stream()
+                .filter(e -> e.getParentId().equals(0L))
+                .peek(e -> e.setChildren(getChildren(e, finalCategories)))
+                .collect(Collectors.toList());
+        return R.ok().data("categories", categories);
+    }
+
+    private List<CategoryVO> getChildren(CategoryVO root, List<CategoryVO> categoryVOList) {
+        return categoryVOList
+                .stream()
+                .filter(e -> Objects.equals(e.getParentId(), root.getId()))
+                .peek(e -> e.setChildren(getChildren(e, categoryVOList)))
+                .collect(Collectors.toList());
+    }
+
+    @PostMapping("addCategory")
+    @SaCheckLogin
+    @ApiOperation("添加分类")
+    public R addCategory(@Validated @RequestBody Category category) {
+        System.err.println(category);
+        if (categoryService.addCategory(category) >= 1) {
+            return R.ok().message("添加成功");
+        }
+        return R.error().message("添加失败");
+    }
+
     @PostMapping("release")
     @SaCheckLogin
     @ApiOperation("发布")
-    public R release(@Validated @RequestBody Blog blog)  {
+    public R release(@Validated @RequestBody Blog blog) {
         blog.setAuthorId(StpUtil.getLoginIdAsLong());
-        if (blogService.release(blog)>=1) {
+        if (blogService.release(blog) >= 1) {
             return R.ok().message("发布成功");
         }
         return R.error().message("发布失败");
+    }
+
+    @GetMapping("queryBlogPage/{current}/{size}")
+    public R queryBlogPage(@PathVariable("current") Integer current, @PathVariable("size") Integer size) {
+        BlogVO blogVO = blogService.selectPage(current, size);
+        return R.ok().data("blog", blogVO);
+    }
+
+    @GetMapping("queryBlogById/{id}")
+    public R queryBlogById(@PathVariable("id") String id) {
+        Blog blog = blogService.queryBlogById(Long.valueOf(id));
+        return R.ok().data("blog", blog);
+    }
+
+    @GetMapping("queryCategoryNameById/{id}")
+    public R queryCategoryNameById(@PathVariable("id") String id) {
+        Category category = categoryService.queryCategoryNameById(Long.valueOf(id));
+        return R.ok().data("name", category.getName());
+    }
+
+    @GetMapping("queryCategoryNameByIds/{ids}")
+    public R queryCategoryNameByIds(@PathVariable("ids") List<String> ids) {
+        List<Category> categories = categoryService.queryCategoryNameByIds(ids);
+        return R.ok().data("categories", categories);
+    }
+
+    @PostMapping("addComment")
+    public R addComment(@RequestBody Comment comment) {
+        System.out.println(comment);
+        if (commentService.addComment(comment)==1) {
+            return R.ok();
+        }
+        return R.error();
     }
 }
