@@ -17,10 +17,10 @@ public interface UserService extends IService<User> {
     int register(User user);
 
     Boolean login(UserLogin user);
-    UserInfo infoById(String id);
+    UserInfo getInfoById(Long id);
     UserInfo infoByName(String name);
     int editProfileById(UserProfile userProfile, String id);
     int editPasswordById(UserEditPassword userEditPassword, String id);
-    String getAvatar(String id);
+    String getAvatarById(Long id);
     int setAvatar(String id,String format);
 }

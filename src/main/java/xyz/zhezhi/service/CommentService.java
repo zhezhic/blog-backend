@@ -2,6 +2,9 @@ package xyz.zhezhi.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import xyz.zhezhi.module.entity.Comment;
+import xyz.zhezhi.module.vo.CommentVO;
+
+import java.util.List;
 
 /**
  * @author zhezhi
@@ -12,4 +15,6 @@ import xyz.zhezhi.module.entity.Comment;
  */
 public interface CommentService extends IService<Comment> {
     int addComment(Comment comment);
+
+    List<CommentVO> queryCommentsByBlogId(Long id);
 }

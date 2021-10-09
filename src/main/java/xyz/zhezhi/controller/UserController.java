@@ -62,14 +62,19 @@ public class UserController {
         return R.error().message("密码错误");
     }
 
-    @GetMapping("info")
+    @GetMapping("getInfo")
     @SaCheckLogin
     @ApiOperation("用户信息")
-    public R info() {
-        UserInfo userInfo = userService.infoById(StpUtil.getLoginIdAsString());
+    public R getInfo() {
+        UserInfo userInfo = userService.getInfoById(StpUtil.getLoginIdAsLong());
         return R.ok().data("userInfo", userInfo);
     }
-
+    @GetMapping("getInfoById/{id}")
+    @ApiOperation("根据id获取用户信息")
+    public R getInfoById(@PathVariable("id") String id) {
+        UserInfo userInfo = userService.getInfoById(Long.valueOf(id));
+        return R.ok().data("userInfo", userInfo);
+    }
     @DeleteMapping("logout")
     @SaCheckLogin
     @ApiOperation("用户注销")
@@ -78,10 +83,10 @@ public class UserController {
         return R.ok().message("注销成功");
     }
 
-    @PostMapping("editAvatar")
+    @PostMapping("updateAvatar")
     @SaCheckLogin
     @ApiOperation("添加用户头像")
-    public R editAvatar(@RequestParam("file") MultipartFile imgFile) {
+    public R updateAvatar(@RequestParam("file") MultipartFile imgFile) {
         if (imgFile.isEmpty()) {
             return R.error().message("请上传图片");
         }
@@ -89,10 +94,10 @@ public class UserController {
         String format = imgFile.getContentType().split("/")[1];
         try {
             // 构建真实的文件路径
-            File newFile = new File(imgDirFile + File.separator + StpUtil.getLoginIdAsString() +"."+ format);
+            File newFile = new File(imgDirFile + File.separator + StpUtil.getLoginIdAsString() + "." + format);
             // 上传图片到 -》 “绝对路径”
             imgFile.transferTo(newFile);
-            userService.setAvatar(StpUtil.getLoginIdAsString(),format);
+            userService.setAvatar(StpUtil.getLoginIdAsString(), format);
             return R.ok().message("上传成功");
         } catch (IOException e) {
             e.printStackTrace();
@@ -109,8 +114,8 @@ public class UserController {
             image = ImageIO.read(new FileInputStream(UploadUtils.getAvatarPath() + name));
             os = response.getOutputStream();
             //获取文件的后缀名 jpg
-            String suffix = name.substring(name.lastIndexOf(".")+1);
-            response.setContentType("image/"+suffix);
+            String suffix = name.substring(name.lastIndexOf(".") + 1);
+            response.setContentType("image/" + suffix);
             if (image != null) {
                 ImageIO.write(image, suffix, os);
             }
@@ -120,6 +125,13 @@ public class UserController {
                 os.close();
             }
         }
+    }
+
+    @GetMapping("getAvatarById/{id}")
+    @ApiOperation("根据用户id获取用户头像")
+    public R getAvatarById(@PathVariable("id") String id) {
+        String avatar = userService.getAvatarById(Long.valueOf(id));
+        return R.ok().data("avatar", avatar);
     }
 
     @PostMapping("updateProfile")

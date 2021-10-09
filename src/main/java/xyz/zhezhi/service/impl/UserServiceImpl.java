@@ -53,7 +53,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public UserInfo infoById(String id) {
+    public UserInfo getInfoById(Long id) {
         QueryWrapper<User> wrapper = new QueryWrapper<>();
         wrapper
                 .eq("id", id)
@@ -123,13 +123,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public String getAvatar(String id) {
+    public String getAvatarById(Long id) {
         User user = userMapper.selectById(id);
         if (user.getAvatar().isBlank()) {
             throw new CustomException(400, "无头像");
         }
         return user.getAvatar();
     }
+
+//    @Override
+//    public String getAvatar(String id) {
+//        User user = userMapper.selectById(id);
+//        if (user.getAvatar().isBlank()) {
+//            throw new CustomException(400, "无头像");
+//        }
+//        return user.getAvatar();
+//    }
 
     @Override
     public int setAvatar(String id,String format) {

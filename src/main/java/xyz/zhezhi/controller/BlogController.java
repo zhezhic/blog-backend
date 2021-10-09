@@ -10,12 +10,10 @@ import org.springframework.web.multipart.MultipartFile;
 import xyz.zhezhi.common.R;
 import xyz.zhezhi.module.entity.Blog;
 import xyz.zhezhi.module.entity.Category;
-import xyz.zhezhi.module.entity.Comment;
 import xyz.zhezhi.module.vo.BlogVO;
 import xyz.zhezhi.module.vo.CategoryVO;
 import xyz.zhezhi.service.BlogService;
 import xyz.zhezhi.service.CategoryService;
-import xyz.zhezhi.service.CommentService;
 import xyz.zhezhi.utils.UploadUtils;
 
 import javax.imageio.ImageIO;
@@ -25,7 +23,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -41,11 +42,10 @@ import java.util.stream.Collectors;
 public class BlogController {
     BlogService blogService;
     CategoryService categoryService;
-    CommentService commentService;
-    public BlogController(BlogService blogService, CategoryService categoryService,CommentService commentService) {
+
+    public BlogController(BlogService blogService, CategoryService categoryService) {
         this.blogService = blogService;
         this.categoryService = categoryService;
-        this.commentService = commentService;
     }
 
     @ApiOperation("上传图片")
@@ -169,12 +169,5 @@ public class BlogController {
         return R.ok().data("categories", categories);
     }
 
-    @PostMapping("addComment")
-    public R addComment(@RequestBody Comment comment) {
-        System.out.println(comment);
-        if (commentService.addComment(comment)==1) {
-            return R.ok();
-        }
-        return R.error();
-    }
+
 }
