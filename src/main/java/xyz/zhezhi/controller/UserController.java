@@ -75,6 +75,7 @@ public class UserController {
         UserInfo userInfo = userService.getInfoById(Long.valueOf(id));
         return R.ok().data("userInfo", userInfo);
     }
+
     @DeleteMapping("logout")
     @SaCheckLogin
     @ApiOperation("用户注销")

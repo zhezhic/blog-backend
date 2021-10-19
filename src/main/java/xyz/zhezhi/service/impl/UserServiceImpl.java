@@ -76,6 +76,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return new UserInfo(u);
     }
 
+
     @Override
     public int editProfileById(UserProfile userProfile, String id) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
@@ -130,15 +131,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         return user.getAvatar();
     }
-
-//    @Override
-//    public String getAvatar(String id) {
-//        User user = userMapper.selectById(id);
-//        if (user.getAvatar().isBlank()) {
-//            throw new CustomException(400, "无头像");
-//        }
-//        return user.getAvatar();
-//    }
 
     @Override
     public int setAvatar(String id,String format) {

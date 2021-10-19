@@ -4,11 +4,17 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.stereotype.Service;
+import xyz.zhezhi.common.ElasticSearchIndex;
 import xyz.zhezhi.mapper.BlogMapper;
 import xyz.zhezhi.module.entity.Blog;
 import xyz.zhezhi.module.vo.BlogVO;
 import xyz.zhezhi.service.BlogService;
+import xyz.zhezhi.utils.ElasticSearchUtils;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author zhezhi
@@ -19,15 +25,18 @@ import xyz.zhezhi.service.BlogService;
  */
 @Service
 public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements BlogService {
-    BlogMapper blogMapper;
-
-    public BlogServiceImpl(BlogMapper blogMapper) {
+    final BlogMapper blogMapper;
+    final RestHighLevelClient restHighLevelClient;
+    public BlogServiceImpl(BlogMapper blogMapper, RestHighLevelClient restHighLevelClient) {
         this.blogMapper = blogMapper;
+        this.restHighLevelClient = restHighLevelClient;
     }
 
     @Override
-    public int release(Blog blog) {
-        return blogMapper.insert(blog);
+    public int release(Blog blog)  {
+        int result = blogMapper.insert(blog);
+        ElasticSearchUtils.IndexRequest(blog, ElasticSearchIndex.BLOG.getIndex(), String.valueOf(blog.getId()));
+        return result;
     }
 
     @Override
@@ -54,6 +63,12 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
                 .eq("is_public",0)
         ;
         return blogMapper.selectOne(wrapper);
+    }
+
+    @Override
+    public List<Map<String, Object>> searchByKeyword(String keyword, int current, int size,String index,String properties) {
+        List<Map<String, Object>> list = ElasticSearchUtils.searchRequest(keyword, current, size,index,properties);
+        return list;
     }
 
 }

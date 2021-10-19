@@ -4,6 +4,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import xyz.zhezhi.module.entity.Blog;
 import xyz.zhezhi.module.vo.BlogVO;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author zhezhi
  * @className: BlogService
@@ -15,4 +18,5 @@ public interface BlogService extends IService<Blog> {
     int release(Blog blog);
     BlogVO selectPage(Integer current, Integer size);
     Blog queryBlogById(Long id);
+    List<Map<String, Object>> searchByKeyword(String keyword, int current, int size,String index,String properties);
 }

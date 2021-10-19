@@ -5,9 +5,22 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.common.text.Text;
+import org.elasticsearch.core.TimeValue;
+import org.elasticsearch.index.query.MatchQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import xyz.zhezhi.common.ElasticSearchIndex;
 import xyz.zhezhi.mapper.BlogMapper;
 import xyz.zhezhi.mapper.CategoryMapper;
 import xyz.zhezhi.mapper.UserMapper;
@@ -16,6 +29,8 @@ import xyz.zhezhi.module.entity.Category;
 import xyz.zhezhi.module.entity.Upload;
 import xyz.zhezhi.module.entity.User;
 import xyz.zhezhi.module.vo.CategoryVO;
+import xyz.zhezhi.service.BlogService;
+import xyz.zhezhi.utils.ElasticSearchUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -24,6 +39,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @SpringBootTest
@@ -33,10 +50,13 @@ class ApplicationTests {
     @Autowired
     private BlogMapper blogMapper;
     @Autowired
+    private BlogService blogService;
+    @Autowired
     private CategoryMapper categoryMapper;
     @Autowired
     Upload upload;
-
+    @Autowired
+    private RestHighLevelClient restHighLevelClient;
     @Test
     void contextLoads() {
         User user = new User();
@@ -146,6 +166,84 @@ class ApplicationTests {
         for (Blog record : records) {
             System.out.println(record);
         }
+    }
+    @Test
+    public void elasticsearch() throws IOException {
+//        if(!restHighLevelClient.indices().exists(new GetIndexRequest("zz_blog"), RequestOptions.DEFAULT)){
+//            restHighLevelClient.indices().create(new CreateIndexRequest("zz_blog"), RequestOptions.DEFAULT);
+            Blog blog = new Blog();
+            blog.setId(111112211111L);
+            blog.setAuthorId(4234235532L);
+            blog.setContent("ldkhflsakdjfshdvjsfhsfjakskjdhfaskjd");
+            blog.setTitle("java extend");
+            ElasticSearchUtils.IndexRequest(blog, ElasticSearchIndex.BLOG.getIndex(), blog.getId().toString());
+//        System.out.println(ElasticSearchIndex.BLOG);
+//        }else {
+//            System.out.println("已存在");
+//        }
+//        CreateIndexRequest request = new CreateIndexRequest("zz_index");
+//        CreateIndexResponse response = restHighLevelClient.indices().create(request, RequestOptions.DEFAULT);
+//        System.out.println(response);
+//        DeleteIndexRequest request = new DeleteIndexRequest("te");
+//        restHighLevelClient.indices().delete(request, RequestOptions.DEFAULT);
+    }
 
+    @Test
+    public void temp()  {
+        int current = 0;
+        int size = 5;
+        String index = ElasticSearchIndex.BLOG.getIndex();
+        String properties = "title";
+        String keyword = "中国";
+        //条件查询
+        SearchRequest searchRequest = new SearchRequest(index);
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+        //分页
+        sourceBuilder.from(current);
+        sourceBuilder.size(size);
+        //精准匹配
+        MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery(properties, keyword);
+        sourceBuilder.query(matchQueryBuilder);
+        sourceBuilder.timeout(new TimeValue(60, TimeUnit.SECONDS));
+        //高亮
+        HighlightBuilder highlightBuilder = new HighlightBuilder();
+        highlightBuilder.requireFieldMatch(false);//多个高亮显示
+        highlightBuilder.field(properties);
+        highlightBuilder.preTags("<span style='color:red'>");
+        highlightBuilder.postTags("</span>");
+        sourceBuilder.highlighter(highlightBuilder);
+        //执行搜索
+        searchRequest.source(sourceBuilder);
+
+        SearchResponse searchResponse = null;
+        try {
+            searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //解析结果
+        ArrayList<Map<String,Object>> list = new ArrayList<>();
+        try {
+            for (SearchHit documentFields : searchResponse.getHits().getHits()) {
+                Map<String, HighlightField> fields = documentFields.getHighlightFields();
+                HighlightField title = fields.get(properties);
+                Map<String, Object> sourceAsMap = documentFields.getSourceAsMap();//原来的结果
+                //解析高亮的字段
+                if(title!=null){
+                    Text[] texts = title.fragments();
+                    StringBuilder newTitle = new StringBuilder();
+                    for (Text text : texts) {
+                        newTitle.append(text);
+                    }
+                    sourceAsMap.put("title", newTitle.toString());//高亮字段替换掉原来的内容即可
+                }
+                list.add(sourceAsMap);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        for (Map<String, Object> map : list) {
+            System.err.println(map);
+        }
     }
 }

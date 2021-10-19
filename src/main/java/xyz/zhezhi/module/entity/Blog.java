@@ -1,5 +1,7 @@
 package xyz.zhezhi.module.entity;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson.serializer.ToStringSerializer;
 import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
@@ -26,9 +28,11 @@ import java.time.LocalDateTime;
 public class Blog {
     @ApiModelProperty("帖子id")
     @TableId(type = IdType.ASSIGN_ID)
+    @JSONField(serializeUsing = ToStringSerializer.class)
     private Long id;
 
     @ApiModelProperty("作者id")
+    @JSONField(serializeUsing = ToStringSerializer.class)
     private Long authorId;
 
     @ApiModelProperty("标题")
@@ -65,10 +69,12 @@ public class Blog {
     @TableField(fill = FieldFill.INSERT)
     @ApiModelProperty("创建时间")
     @JsonFormat(shape = JsonFormat.Shape.STRING,pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh_CN",timezone = "Asia/Shanghai")
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
 
     @TableField(fill = FieldFill.INSERT_UPDATE)
     @JsonFormat(shape = JsonFormat.Shape.STRING,pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh_CN",timezone = "Asia/Shanghai")
     @ApiModelProperty("更新时间")
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateTime;
 }
