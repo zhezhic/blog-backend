@@ -23,10 +23,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -156,7 +153,11 @@ public class BlogController {
         Blog blog = blogService.queryBlogById(Long.valueOf(id));
         return R.ok().data("blog", blog);
     }
-
+    @GetMapping("queryBlogByIds/{ids}")
+    public R queryBlogByIds(@PathVariable("ids") List<String> ids) {
+        List<Blog> blogs = blogService.queryBlogVOByIds(ids);
+        return R.ok().data("blogs",blogs);
+    }
     @GetMapping("queryCategoryNameById/{id}")
     public R queryCategoryNameById(@PathVariable("id") String id) {
         Category category = categoryService.queryCategoryNameById(Long.valueOf(id));
@@ -168,6 +169,4 @@ public class BlogController {
         List<Category> categories = categoryService.queryCategoryNameByIds(ids);
         return R.ok().data("categories", categories);
     }
-
-
 }

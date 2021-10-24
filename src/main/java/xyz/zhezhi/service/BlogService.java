@@ -17,6 +17,8 @@ import java.util.Map;
 public interface BlogService extends IService<Blog> {
     int release(Blog blog);
     BlogVO selectPage(Integer current, Integer size);
+    List<Blog> queryBlogVOByIds(List<String> ids);
     Blog queryBlogById(Long id);
     List<Map<String, Object>> searchByKeyword(String keyword, int current, int size,String index,String properties);
+    List<Map<String,Object>> searchBlog(String index,String content, int current, int size,String... fieldNames);
 }

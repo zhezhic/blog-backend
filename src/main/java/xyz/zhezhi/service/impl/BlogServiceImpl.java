@@ -56,6 +56,13 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     }
 
     @Override
+    public List<Blog> queryBlogVOByIds(List<String> ids) {
+        QueryWrapper<Blog> wrapper = new QueryWrapper<>();
+        wrapper.in("id", ids);
+        return blogMapper.selectList(wrapper);
+    }
+
+    @Override
     public Blog queryBlogById(Long id) {
         QueryWrapper<Blog> wrapper = new QueryWrapper<>();
         wrapper
@@ -69,6 +76,13 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     public List<Map<String, Object>> searchByKeyword(String keyword, int current, int size,String index,String properties) {
         List<Map<String, Object>> list = ElasticSearchUtils.searchRequest(keyword, current, size,index,properties);
         return list;
+    }
+
+    @Override
+    public List<Map<String, Object>> searchBlog(String index, String content, int current, int size, String... fieldNames) {
+        List<Map<String, Object>> blogs = ElasticSearchUtils.multiSearchRequest(index, content, current, size,
+                fieldNames);
+        return blogs;
     }
 
 }

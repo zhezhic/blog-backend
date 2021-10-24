@@ -32,4 +32,13 @@ public class SearchController {
         List<Map<String, Object>> list = blogService.searchByKeyword(keyword, current,size, ElasticSearchIndex.BLOG.getIndex(),"title");
         return R.ok().data("list", list);
     }
+    @GetMapping("/multiSearch/{content}/{current}/{size}")
+    public R multiSearch(@PathVariable("content") String content,
+                         @PathVariable("current") int current,
+                         @PathVariable("size") int size){
+        List<Map<String, Object>> blogs = blogService.searchBlog(ElasticSearchIndex.BLOG.getIndex(), content, current,
+                size,
+                "title", "content");
+        return R.ok().data("list",blogs);
+    }
 }

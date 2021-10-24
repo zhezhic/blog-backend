@@ -189,7 +189,7 @@ class ApplicationTests {
     }
 
     @Test
-    public void temp()  {
+    public void matchSearch()  {
         int current = 0;
         int size = 5;
         String index = ElasticSearchIndex.BLOG.getIndex();
@@ -245,5 +245,24 @@ class ApplicationTests {
         for (Map<String, Object> map : list) {
             System.err.println(map);
         }
+    }
+
+    @Test
+    public void multiSearch() throws IOException {
+        String index = ElasticSearchIndex.BLOG.getIndex();
+        String property1 = "title";
+        String property2 = "content";
+        String content = "java pixiv";
+        SearchRequest request = new SearchRequest(index);
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        searchSourceBuilder.query(QueryBuilders.multiMatchQuery(content, property1, property2));
+        request.source(searchSourceBuilder);
+        SearchResponse response = restHighLevelClient.search(request, RequestOptions.DEFAULT);
+        SearchHit[] hits = response.getHits().getHits();
+        ArrayList<String> blogIdList = new ArrayList<>();
+        for (SearchHit hit : hits) {
+            blogIdList.add(hit.getId());
+        }
+        System.out.println(blogIdList);
     }
 }
