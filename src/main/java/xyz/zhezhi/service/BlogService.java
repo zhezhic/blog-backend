@@ -5,7 +5,6 @@ import xyz.zhezhi.module.entity.Blog;
 import xyz.zhezhi.module.vo.BlogVO;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author zhezhi
@@ -19,6 +18,5 @@ public interface BlogService extends IService<Blog> {
     BlogVO selectPage(Integer current, Integer size);
     List<Blog> queryBlogVOByIds(List<String> ids);
     Blog queryBlogById(Long id);
-    List<Map<String, Object>> searchByKeyword(String keyword, int current, int size,String index,String properties);
-    List<Map<String,Object>> searchBlog(String index,String content, int current, int size,String... fieldNames);
+
 }

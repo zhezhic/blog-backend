@@ -44,10 +44,12 @@ public class Initialization {
             }
             log.info("初始化文件夹成功:" + path);
         }
-        if (!restHighLevelClient.indices().exists(new GetIndexRequest(ElasticSearchIndex.BLOG.getIndex()), RequestOptions.DEFAULT)) {
-
+        GetIndexRequest getIndexRequest = new GetIndexRequest(ElasticSearchIndex.BLOG.getIndex());
+        boolean blogIndex = restHighLevelClient.indices().exists(getIndexRequest, RequestOptions.DEFAULT);
+        getIndexRequest = new GetIndexRequest(ElasticSearchIndex.USER.getIndex());
+        boolean userIndex = restHighLevelClient.indices().exists(getIndexRequest, RequestOptions.DEFAULT);
+        if (!blogIndex) {
             CreateIndexRequest request = new CreateIndexRequest(ElasticSearchIndex.BLOG.getIndex());
-
             XContentBuilder builder = XContentFactory.jsonBuilder();
             builder.startObject();
             {
@@ -93,9 +95,44 @@ public class Initialization {
                 builder.endObject();
             }
             builder.endObject();
-
             request.mapping(builder);
+            restHighLevelClient.indices().create(request, RequestOptions.DEFAULT);
+        }
+        if (!userIndex) {
+            CreateIndexRequest request = new CreateIndexRequest(ElasticSearchIndex.USER.getIndex());
+            XContentBuilder builder = XContentFactory.jsonBuilder();
+            builder.startObject();
+            {
+                builder.startObject("properties");
+                {
 
+                    builder.startObject("name");
+                    {
+                        builder.field("type", "text");
+                        builder.field("analyzer", "ik_max_word");
+                        builder.field("search_analyzer", "ik_max_word");
+                    }
+                    builder.endObject();
+
+                    builder.startObject("createTime");
+                    {
+                        builder.field("type", "date");
+                        builder.field("format", "yyyy-MM-dd HH:mm:ss");
+                    }
+                    builder.endObject();
+
+                    builder.startObject("updateTime");
+                    {
+                        builder.field("type", "date");
+                        builder.field("format", "yyyy-MM-dd HH:mm:ss");
+                    }
+                    builder.endObject();
+
+                }
+                builder.endObject();
+            }
+            builder.endObject();
+            request.mapping(builder);
             restHighLevelClient.indices().create(request, RequestOptions.DEFAULT);
         }
     }

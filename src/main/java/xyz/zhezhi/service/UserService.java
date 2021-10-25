@@ -19,7 +19,7 @@ public interface UserService extends IService<User> {
     Boolean login(UserLogin user);
     UserInfo getInfoById(Long id);
     UserInfo infoByName(String name);
-    int editProfileById(UserProfile userProfile, String id);
+    int updateProfileById(UserProfile userProfile);
     int editPasswordById(UserEditPassword userEditPassword, String id);
     String getAvatarById(Long id);
     int setAvatar(String id,String format);

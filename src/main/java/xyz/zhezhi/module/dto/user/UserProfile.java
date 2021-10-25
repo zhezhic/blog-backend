@@ -1,5 +1,7 @@
 package xyz.zhezhi.module.dto.user;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -22,6 +24,9 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserProfile {
+    @ApiModelProperty("用户ID")
+    @TableId(type = IdType.ASSIGN_ID)
+    private Long id;
     @ApiModelProperty("用户名称")
     @Size(min = 3, max = 10, message = "名称长度不符合要求")
     @NotBlank(message = "用户名不能为空")

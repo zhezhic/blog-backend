@@ -14,7 +14,6 @@ import xyz.zhezhi.service.BlogService;
 import xyz.zhezhi.utils.ElasticSearchUtils;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author zhezhi
@@ -72,17 +71,6 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         return blogMapper.selectOne(wrapper);
     }
 
-    @Override
-    public List<Map<String, Object>> searchByKeyword(String keyword, int current, int size,String index,String properties) {
-        List<Map<String, Object>> list = ElasticSearchUtils.searchRequest(keyword, current, size,index,properties);
-        return list;
-    }
 
-    @Override
-    public List<Map<String, Object>> searchBlog(String index, String content, int current, int size, String... fieldNames) {
-        List<Map<String, Object>> blogs = ElasticSearchUtils.multiSearchRequest(index, content, current, size,
-                fieldNames);
-        return blogs;
-    }
 
 }

@@ -8,7 +8,8 @@ package xyz.zhezhi.common;
  * @version：1.0
  */
 public enum ElasticSearchIndex {
-    BLOG("blog");
+    BLOG("blog"),
+    USER("user");
     private final String index;
     ElasticSearchIndex(String index) {
         this.index = index;

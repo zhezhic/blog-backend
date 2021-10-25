@@ -21,7 +21,7 @@ public class GenerateAvatar {
     private static String avatar;
     @Value("${myconfig.upload.avatar}")
     public void setAvatar(String avatar) {
-        this.avatar = avatar;
+        GenerateAvatar.avatar = avatar;
     }
     private static final int WIDTH = 36;
     private static final int HEIGHT = 36;

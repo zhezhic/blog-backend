@@ -138,8 +138,9 @@ public class UserController {
     @PostMapping("updateProfile")
     @SaCheckLogin
     @ApiOperation("更新用户个人资料")
-    public R updateProfile(@Validated @RequestBody UserProfile userProfile) {
-        int result = userService.editProfileById(userProfile, StpUtil.getLoginIdAsString());
+    public R updateProfileById(@Validated @RequestBody UserProfile userProfile) {
+        userProfile.setId(StpUtil.getLoginIdAsLong());
+        int result = userService.updateProfileById(userProfile);
         if (result >= 1) {
             return R.ok().message("保存成功");
         }
