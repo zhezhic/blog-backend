@@ -98,7 +98,11 @@ public class UserController {
             File newFile = new File(imgDirFile + File.separator + StpUtil.getLoginIdAsString() + "." + format);
             // 上传图片到 -》 “绝对路径”
             imgFile.transferTo(newFile);
-            userService.setAvatar(StpUtil.getLoginIdAsString(), format);
+            String avatarUrl = "http://127.0.0.1:8087/user/getAvatar/" +
+                    StpUtil.getLoginIdAsString() +
+                    "." +
+                    format;
+            userService.setAvatar(StpUtil.getLoginIdAsString(), avatarUrl);
             return R.ok().message("上传成功");
         } catch (IOException e) {
             e.printStackTrace();

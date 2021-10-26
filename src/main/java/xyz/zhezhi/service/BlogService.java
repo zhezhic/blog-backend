@@ -18,5 +18,5 @@ public interface BlogService extends IService<Blog> {
     BlogVO selectPage(Integer current, Integer size);
     List<Blog> queryBlogVOByIds(List<String> ids);
     Blog queryBlogById(Long id);
-
+    List<Blog> queryBlogsByUserId(Long id);
 }

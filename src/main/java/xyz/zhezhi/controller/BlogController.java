@@ -153,6 +153,11 @@ public class BlogController {
         Blog blog = blogService.queryBlogById(Long.valueOf(id));
         return R.ok().data("blog", blog);
     }
+    @GetMapping("queryBlogsByUserId/{id}")
+    public R queryBlogsByUserId(@PathVariable("id") String id) {
+        List<Blog> blogs = blogService.queryBlogsByUserId(Long.valueOf(id));
+        return R.ok().data("blogs", blogs);
+    }
     @GetMapping("queryBlogByIds/{ids}")
     public R queryBlogByIds(@PathVariable("ids") List<String> ids) {
         List<Blog> blogs = blogService.queryBlogVOByIds(ids);

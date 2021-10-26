@@ -71,6 +71,15 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         return blogMapper.selectOne(wrapper);
     }
 
+    @Override
+    public List<Blog> queryBlogsByUserId(Long id) {
+        QueryWrapper<Blog> wrapper = new QueryWrapper<>();
+        wrapper
+                .eq("author_id",id)
+                .eq("is_public",0)
+        ;
+        return blogMapper.selectList(wrapper);
+    }
 
 
 }
