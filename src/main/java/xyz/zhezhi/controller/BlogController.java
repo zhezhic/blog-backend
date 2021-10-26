@@ -168,7 +168,11 @@ public class BlogController {
         Category category = categoryService.queryCategoryNameById(Long.valueOf(id));
         return R.ok().data("name", category.getName());
     }
-
+    @GetMapping("queryCategoriesByUserId/{id}")
+    public R queryCategoriesByUserId(@PathVariable("id") String id) {
+        List<Category> categories = categoryService.queryCategoriesByUserId(id);
+        return R.ok().data("categories",categories);
+    }
     @GetMapping("queryCategoryNameByIds/{ids}")
     public R queryCategoryNameByIds(@PathVariable("ids") List<String> ids) {
         List<Category> categories = categoryService.queryCategoryNameByIds(ids);

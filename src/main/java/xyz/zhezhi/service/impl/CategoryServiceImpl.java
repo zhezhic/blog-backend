@@ -55,6 +55,13 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
     }
 
     @Override
+    public List<Category> queryCategoriesByUserId(String id) {
+        QueryWrapper<Category> wrapper = new QueryWrapper<>();
+        wrapper.eq("author_id", id);
+        return categoryMapper.selectList(wrapper);
+    }
+
+    @Override
     public List<Category> queryCategoryNameByIds(List<String> ids) {
         List<Long> collect = ids.stream().map(Long::valueOf).collect(Collectors.toList());
         QueryWrapper<Category> wrapper = new QueryWrapper<>();

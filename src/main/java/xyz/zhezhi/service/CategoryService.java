@@ -16,5 +16,6 @@ public interface CategoryService extends IService<Category> {
     int addCategory(Category category);
     List<Category> getCategories(Long authorId);
     Category queryCategoryNameById(Long id);
+    List<Category> queryCategoriesByUserId(String id);
     List<Category> queryCategoryNameByIds(List<String> ids);
 }
