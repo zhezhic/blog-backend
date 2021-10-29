@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import xyz.zhezhi.common.R;
 import xyz.zhezhi.module.entity.Comment;
 import xyz.zhezhi.module.vo.CommentVO;
+import xyz.zhezhi.service.BlogService;
 import xyz.zhezhi.service.CommentService;
 
 import java.util.List;
@@ -23,9 +24,10 @@ import java.util.List;
 @RequestMapping("/comment/")
 public class CommentController {
     CommentService commentService;
-
-    public CommentController(CommentService commentService) {
+    BlogService blogService;
+    public CommentController(CommentService commentService,BlogService blogService) {
         this.commentService = commentService;
+        this.blogService = blogService;
     }
 
     @PostMapping("addComment")
@@ -33,7 +35,8 @@ public class CommentController {
     public R addComment(@RequestBody Comment comment) {
         comment.setAuthorId(StpUtil.getLoginIdAsLong());
         System.out.println(comment);
-        if (commentService.addComment(comment)==1) {
+        if (commentService.addComment(comment)>=1) {
+            blogService.updateBlogCommentCount(String.valueOf(comment.getBlogId()));
             return R.ok().message("留言成功");
         }
         return R.error();

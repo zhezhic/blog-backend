@@ -24,12 +24,10 @@ import xyz.zhezhi.common.ElasticSearchIndex;
 import xyz.zhezhi.mapper.BlogMapper;
 import xyz.zhezhi.mapper.CategoryMapper;
 import xyz.zhezhi.mapper.UserMapper;
-import xyz.zhezhi.module.entity.Blog;
-import xyz.zhezhi.module.entity.Category;
-import xyz.zhezhi.module.entity.Upload;
-import xyz.zhezhi.module.entity.User;
+import xyz.zhezhi.module.entity.*;
 import xyz.zhezhi.module.vo.CategoryVO;
 import xyz.zhezhi.service.BlogService;
+import xyz.zhezhi.service.SayService;
 import xyz.zhezhi.utils.ElasticSearchUtils;
 
 import java.io.BufferedReader;
@@ -53,6 +51,8 @@ class ApplicationTests {
     private BlogService blogService;
     @Autowired
     private CategoryMapper categoryMapper;
+    @Autowired
+    private SayService sayService;
     @Autowired
     Upload upload;
     @Autowired
@@ -264,5 +264,13 @@ class ApplicationTests {
             blogIdList.add(hit.getId());
         }
         System.out.println(blogIdList);
+    }
+
+    @Test
+    public void addSay() {
+        Say say = new Say();
+        say.setContent("hello");
+        say.setAuthorId(1452969799829508097L);
+        int i = sayService.addSay(say);
     }
 }

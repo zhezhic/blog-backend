@@ -1,6 +1,7 @@
 package xyz.zhezhi.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -39,6 +40,26 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     }
 
     @Override
+    public int updateBlog(Blog blog) {
+        UpdateWrapper<Blog> wrapper = new UpdateWrapper<>();
+        wrapper
+                .eq("id",blog.getId())
+                .eq("author_id", blog.getAuthorId());
+        int result = blogMapper.update(blog,wrapper);
+        ElasticSearchUtils.updateRequestByBlog(blog,ElasticSearchIndex.BLOG.getIndex());
+        return result;
+    }
+
+    @Override
+    public int deleteBlogById(String blogId, String userId) {
+        QueryWrapper<Blog> wrapper = new QueryWrapper<>();
+        wrapper.eq("id", blogId).eq("author_id", userId);
+        int result = blogMapper.delete(wrapper);
+        ElasticSearchUtils.deleteRequest(ElasticSearchIndex.BLOG.getIndex(),blogId);
+        return result;
+    }
+
+    @Override
     public BlogVO selectPage(Integer current, Integer size) {
         QueryWrapper<Blog> wrapper = new QueryWrapper<>();
         wrapper
@@ -69,6 +90,26 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
                 .eq("is_public",0)
         ;
         return blogMapper.selectOne(wrapper);
+    }
+
+    @Override
+    public int updateBlogHot(String id) {
+        UpdateWrapper<Blog> wrapper = new UpdateWrapper<>();
+        wrapper
+                .eq("id", id)
+                .setSql("hot=hot+1")
+        ;
+        return blogMapper.update(null, wrapper);
+    }
+
+    @Override
+    public int updateBlogCommentCount(String id) {
+        UpdateWrapper<Blog> wrapper = new UpdateWrapper<>();
+        wrapper
+                .eq("id", id)
+                .setSql("comment_count=comment_count+1")
+        ;
+        return blogMapper.update(null, wrapper);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package xyz.zhezhi.utils;
 
 import com.alibaba.fastjson.JSON;
+import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -19,6 +20,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.springframework.stereotype.Component;
+import xyz.zhezhi.module.entity.Blog;
 import xyz.zhezhi.module.entity.User;
 
 import java.io.IOException;
@@ -70,6 +72,38 @@ public class ElasticSearchUtils {
             UpdateRequest request = new UpdateRequest(index, String.valueOf(user.getId()))
                     .doc(builder);
             restHighLevelClient.update(request, RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public static void updateRequestByBlog(Blog blog, String index) {
+        XContentBuilder builder;
+        try {
+            builder = XContentFactory.jsonBuilder();
+            builder.startObject();
+            {
+                builder.timeField("updateTime", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(blog.getUpdateTime()));
+                builder.field("alias", blog.getAlias());
+                builder.field("title", blog.getTitle());
+                builder.field("categoriesId", blog.getCategoriesId());
+                builder.field("content", blog.getContent());
+                builder.field("context", blog.getContext());
+            }
+            builder.endObject();
+            UpdateRequest request = new UpdateRequest(index, String.valueOf(blog.getId()))
+                    .doc(builder);
+            restHighLevelClient.update(request, RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void deleteRequest(String index,String id) {
+        DeleteRequest request = new DeleteRequest(index,id);
+        request.timeout("10s");
+
+        try {
+            restHighLevelClient.delete(request, RequestOptions.DEFAULT);
         } catch (IOException e) {
             e.printStackTrace();
         }

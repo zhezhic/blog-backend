@@ -124,7 +124,6 @@ public class BlogController {
     @SaCheckLogin
     @ApiOperation("添加分类")
     public R addCategory(@Validated @RequestBody Category category) {
-        System.err.println(category);
         if (categoryService.addCategory(category) >= 1) {
             return R.ok().message("添加成功");
         }
@@ -142,6 +141,26 @@ public class BlogController {
         return R.error().message("发布失败");
     }
 
+    @PostMapping("updateBlog")
+    @SaCheckLogin
+    @ApiOperation("更新博客")
+    public R updateBlog(@Validated @RequestBody Blog blog) {
+        blog.setAuthorId(StpUtil.getLoginIdAsLong());
+        if (blogService.updateBlog(blog) >= 1) {
+            return R.ok().message("更新成功");
+        }
+        return R.error().message("更新失败");
+    }
+    @DeleteMapping("deleteBlogById/{id}")
+    @SaCheckLogin
+    @ApiOperation("删除博客")
+    public R deleteBlogById(@PathVariable("id") String id) {
+        int i = blogService.deleteBlogById(id, StpUtil.getLoginIdAsString());
+        if (i == 1) {
+            return R.ok().message("删除成功");
+        }
+        return R.error().message("删除失败");
+    }
     @GetMapping("queryBlogPage/{current}/{size}")
     public R queryBlogPage(@PathVariable("current") Integer current, @PathVariable("size") Integer size) {
         BlogVO blogVO = blogService.selectPage(current, size);
@@ -151,28 +170,34 @@ public class BlogController {
     @GetMapping("queryBlogById/{id}")
     public R queryBlogById(@PathVariable("id") String id) {
         Blog blog = blogService.queryBlogById(Long.valueOf(id));
+        blogService.updateBlogHot(id);
         return R.ok().data("blog", blog);
     }
+
     @GetMapping("queryBlogsByUserId/{id}")
     public R queryBlogsByUserId(@PathVariable("id") String id) {
         List<Blog> blogs = blogService.queryBlogsByUserId(Long.valueOf(id));
         return R.ok().data("blogs", blogs);
     }
+
     @GetMapping("queryBlogByIds/{ids}")
     public R queryBlogByIds(@PathVariable("ids") List<String> ids) {
         List<Blog> blogs = blogService.queryBlogVOByIds(ids);
-        return R.ok().data("blogs",blogs);
+        return R.ok().data("blogs", blogs);
     }
+
     @GetMapping("queryCategoryNameById/{id}")
     public R queryCategoryNameById(@PathVariable("id") String id) {
         Category category = categoryService.queryCategoryNameById(Long.valueOf(id));
         return R.ok().data("name", category.getName());
     }
+
     @GetMapping("queryCategoriesByUserId/{id}")
     public R queryCategoriesByUserId(@PathVariable("id") String id) {
         List<Category> categories = categoryService.queryCategoriesByUserId(id);
-        return R.ok().data("categories",categories);
+        return R.ok().data("categories", categories);
     }
+
     @GetMapping("queryCategoryNameByIds/{ids}")
     public R queryCategoryNameByIds(@PathVariable("ids") List<String> ids) {
         List<Category> categories = categoryService.queryCategoryNameByIds(ids);

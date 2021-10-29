@@ -15,6 +15,5 @@ import java.util.List;
  */
 public interface CommentService extends IService<Comment> {
     int addComment(Comment comment);
-
     List<CommentVO> queryCommentsByBlogId(Long id);
 }

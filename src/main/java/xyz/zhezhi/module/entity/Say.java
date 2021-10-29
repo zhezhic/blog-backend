@@ -8,7 +8,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import xyz.zhezhi.handler.JsonStringArrayTypeHandler;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -16,17 +15,16 @@ import java.time.LocalDateTime;
 
 /**
  * @author zhezhi
- * @className: Blog
- * @description: blog entity
- * @date 2021/9/4 下午1:37
+ * @className: Say
+ * @description: 说说
+ * @date 2021/10/29 上午11:31
  * @version：1.0
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName(autoResultMap = true)
-public class Blog {
-    @ApiModelProperty("帖子id")
+public class Say {
+    @ApiModelProperty("说说id")
     @TableId(type = IdType.ASSIGN_ID)
     @JSONField(serializeUsing = ToStringSerializer.class)
     private Long id;
@@ -35,37 +33,10 @@ public class Blog {
     @JSONField(serializeUsing = ToStringSerializer.class)
     private Long authorId;
 
-    @ApiModelProperty("标题")
-    @Size(min = 1, max = 100, message = "名称长度不符合要求")
-    @NotBlank(message = "标题不能为空")
-    private String title;
-
     @ApiModelProperty("内容")
     @Size(min = 1, message = "博客长度不符合要求")
     @NotBlank(message = "帖子不能为空")
     private String content;
-
-    @ApiModelProperty("简略")
-    @NotBlank(message = "简略不能为空")
-    private String context;
-
-    @ApiModelProperty("公开")
-    private Integer isPublic;
-
-    @ApiModelProperty("博客别名")
-    private String alias;
-
-    @ApiModelProperty("博客分类")
-    @TableField(typeHandler = JsonStringArrayTypeHandler.class)
-    private String[] categoriesId;
-
-    @ApiModelProperty("热度")
-    private Integer hot;
-    @ApiModelProperty("博客评论数")
-    private Integer commentCount;
-    @TableLogic
-    @ApiModelProperty("逻辑删除")
-    private Integer deleted;
 
     @TableField(fill = FieldFill.INSERT)
     @ApiModelProperty("创建时间")
