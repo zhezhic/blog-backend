@@ -13,7 +13,7 @@ import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.core.TimeValue;
-import org.elasticsearch.index.query.MatchQueryBuilder;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -127,7 +127,10 @@ public class ElasticSearchUtils {
         highlightBuilder.postTags("</span>");
         searchSourceBuilder.highlighter(highlightBuilder);
         //match 匹配
-        searchSourceBuilder.query(QueryBuilders.multiMatchQuery(content, fieldNames));
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
+                .must(QueryBuilders.multiMatchQuery(content, fieldNames))
+                .must(QueryBuilders.termQuery("isPublic", 1));
+        searchSourceBuilder.query(boolQueryBuilder);
         request.source(searchSourceBuilder);
         SearchResponse response = null;
         try {
@@ -171,8 +174,11 @@ public class ElasticSearchUtils {
             sourceBuilder.fetchSource(includeFields, excludeFields);
         }
         //match 匹配
-        MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery(fieldName, keyword);
-        sourceBuilder.query(matchQueryBuilder);
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
+                .must(QueryBuilders.matchQuery(fieldName, keyword))
+                .must(QueryBuilders.termQuery("isPublic", 1));
+//        MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery(fieldName, keyword);
+        sourceBuilder.query(boolQueryBuilder);
         sourceBuilder.timeout(new TimeValue(60, TimeUnit.SECONDS));
         //高亮
         HighlightBuilder highlightBuilder = new HighlightBuilder();

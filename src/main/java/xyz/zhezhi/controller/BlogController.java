@@ -151,6 +151,7 @@ public class BlogController {
         }
         return R.error().message("更新失败");
     }
+
     @DeleteMapping("deleteBlogById/{id}")
     @SaCheckLogin
     @ApiOperation("删除博客")
@@ -161,6 +162,7 @@ public class BlogController {
         }
         return R.error().message("删除失败");
     }
+
     @GetMapping("queryBlogPage/{current}/{size}")
     public R queryBlogPage(@PathVariable("current") Integer current, @PathVariable("size") Integer size) {
         BlogVO blogVO = blogService.selectPage(current, size);
@@ -174,9 +176,16 @@ public class BlogController {
         return R.ok().data("blog", blog);
     }
 
-    @GetMapping("queryBlogsByUserId/{id}")
-    public R queryBlogsByUserId(@PathVariable("id") String id) {
-        List<Blog> blogs = blogService.queryBlogsByUserId(Long.valueOf(id));
+    @GetMapping("queryBlogsByUserId")
+    @SaCheckLogin
+    public R queryBlogsByUserId() {
+        List<Blog> blogs = blogService.queryBlogsByUserId(StpUtil.getLoginIdAsLong());
+        return R.ok().data("blogs", blogs);
+    }
+
+    @GetMapping("queryBlogsByOtherUserId/{id}")
+    public R queryBlogsByOtherUserId(@PathVariable Long id) {
+        List<Blog> blogs = blogService.queryBlogsByOtherUserId(id);
         return R.ok().data("blogs", blogs);
     }
 

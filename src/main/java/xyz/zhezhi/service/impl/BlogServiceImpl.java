@@ -63,7 +63,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     public BlogVO selectPage(Integer current, Integer size) {
         QueryWrapper<Blog> wrapper = new QueryWrapper<>();
         wrapper
-                .eq("is_public",0)
+                .eq("is_public",1)
                 .select(Blog.class,info -> !info.getColumn().equals("content"))
         ;
         IPage<Blog> page = blogMapper.selectPage(new Page<>(current, size), wrapper);
@@ -87,7 +87,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         QueryWrapper<Blog> wrapper = new QueryWrapper<>();
         wrapper
                 .eq("id",id)
-                .eq("is_public",0)
+                .eq("is_public",1)
         ;
         return blogMapper.selectOne(wrapper);
     }
@@ -117,7 +117,16 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         QueryWrapper<Blog> wrapper = new QueryWrapper<>();
         wrapper
                 .eq("author_id",id)
-                .eq("is_public",0)
+        ;
+        return blogMapper.selectList(wrapper);
+    }
+
+    @Override
+    public List<Blog> queryBlogsByOtherUserId(Long id) {
+        QueryWrapper<Blog> wrapper = new QueryWrapper<>();
+        wrapper
+                .eq("author_id",id)
+                .eq("is_public",1)
         ;
         return blogMapper.selectList(wrapper);
     }
