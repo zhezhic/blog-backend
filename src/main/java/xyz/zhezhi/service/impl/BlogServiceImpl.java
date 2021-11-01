@@ -66,6 +66,30 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
                 .eq("is_public",1)
                 .select(Blog.class,info -> !info.getColumn().equals("content"))
         ;
+        return getBlogVO(current, size, wrapper);
+    }
+    @Override
+    public BlogVO queryBlogPageByUserId(Integer current, Integer size,Long userId) {
+        QueryWrapper<Blog> wrapper = new QueryWrapper<>();
+        wrapper
+                .eq("author_id",userId)
+                .select(Blog.class,info -> !info.getColumn().equals("content"))
+        ;
+        return getBlogVO(current, size, wrapper);
+    }
+
+    @Override
+    public BlogVO queryBlogPageByOtherUserId(Integer current, Integer size, Long otherUserId) {
+        QueryWrapper<Blog> wrapper = new QueryWrapper<>();
+        wrapper
+                .eq("author_id",otherUserId)
+                .eq("is_public",1)
+                .select(Blog.class,info -> !info.getColumn().equals("content"))
+        ;
+        return getBlogVO(current, size, wrapper);
+    }
+
+    private BlogVO getBlogVO(Integer current, Integer size, QueryWrapper<Blog> wrapper) {
         IPage<Blog> page = blogMapper.selectPage(new Page<>(current, size), wrapper);
         BlogVO blogVO = new BlogVO();
         blogVO.setCurrent(current);
@@ -111,25 +135,5 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         ;
         return blogMapper.update(null, wrapper);
     }
-
-    @Override
-    public List<Blog> queryBlogsByUserId(Long id) {
-        QueryWrapper<Blog> wrapper = new QueryWrapper<>();
-        wrapper
-                .eq("author_id",id)
-        ;
-        return blogMapper.selectList(wrapper);
-    }
-
-    @Override
-    public List<Blog> queryBlogsByOtherUserId(Long id) {
-        QueryWrapper<Blog> wrapper = new QueryWrapper<>();
-        wrapper
-                .eq("author_id",id)
-                .eq("is_public",1)
-        ;
-        return blogMapper.selectList(wrapper);
-    }
-
 
 }

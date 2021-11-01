@@ -32,6 +32,6 @@ public class ElasticSearchServiceImpl implements ElasticSearchService {
 
     @Override
     public List<Map<String, Object>> searchUserName(String keyword, String index,boolean returnAll, int current, int size, String fieldName) {
-        return ElasticSearchUtils.searchRequest(keyword, index,returnAll, current, size, fieldName);
+        return ElasticSearchUtils.searchRequestByName(keyword, index,returnAll, current, size, fieldName);
     }
 }

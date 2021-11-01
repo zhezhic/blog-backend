@@ -18,10 +18,10 @@ public interface BlogService extends IService<Blog> {
     int updateBlog(Blog blog);
     int deleteBlogById(String blogId,String userId);
     BlogVO selectPage(Integer current, Integer size);
+    BlogVO queryBlogPageByUserId(Integer current, Integer size,Long userId);
+    BlogVO queryBlogPageByOtherUserId(Integer current, Integer size,Long otherUserId);
     List<Blog> queryBlogVOByIds(List<String> ids);
     Blog queryBlogById(Long id);
     int updateBlogHot(String id);
     int updateBlogCommentCount(String id);
-    List<Blog> queryBlogsByUserId(Long id);
-    List<Blog> queryBlogsByOtherUserId(Long id);
 }

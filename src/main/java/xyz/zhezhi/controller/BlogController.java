@@ -176,17 +176,17 @@ public class BlogController {
         return R.ok().data("blog", blog);
     }
 
-    @GetMapping("queryBlogsByUserId")
+    @GetMapping("queryBlogsByUserId/{current}/{size}")
     @SaCheckLogin
-    public R queryBlogsByUserId() {
-        List<Blog> blogs = blogService.queryBlogsByUserId(StpUtil.getLoginIdAsLong());
-        return R.ok().data("blogs", blogs);
+    public R queryBlogsByUserId(@PathVariable("current") Integer current, @PathVariable("size") Integer size) {
+        BlogVO blogVO = blogService.queryBlogPageByUserId(current, size, StpUtil.getLoginIdAsLong());
+        return R.ok().data("blog", blogVO);
     }
 
-    @GetMapping("queryBlogsByOtherUserId/{id}")
-    public R queryBlogsByOtherUserId(@PathVariable Long id) {
-        List<Blog> blogs = blogService.queryBlogsByOtherUserId(id);
-        return R.ok().data("blogs", blogs);
+    @GetMapping("queryBlogsByOtherUserId/{current}/{size}/{id}")
+    public R queryBlogsByOtherUserId(@PathVariable("current") Integer current, @PathVariable("size") Integer size,@PathVariable Long id) {
+        BlogVO blogVO = blogService.queryBlogPageByOtherUserId(current, size, id);
+        return R.ok().data("blog", blogVO);
     }
 
     @GetMapping("queryBlogByIds/{ids}")

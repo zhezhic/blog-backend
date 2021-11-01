@@ -14,6 +14,7 @@ import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.core.TimeValue;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -179,6 +180,61 @@ public class ElasticSearchUtils {
                 .must(QueryBuilders.termQuery("isPublic", 1));
 //        MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery(fieldName, keyword);
         sourceBuilder.query(boolQueryBuilder);
+        sourceBuilder.timeout(new TimeValue(60, TimeUnit.SECONDS));
+        //高亮
+        HighlightBuilder highlightBuilder = new HighlightBuilder();
+        highlightBuilder.requireFieldMatch(false);//多个高亮显示
+        highlightBuilder.field(fieldName);
+        highlightBuilder.preTags("<span style='color:red'>");
+        highlightBuilder.postTags("</span>");
+        sourceBuilder.highlighter(highlightBuilder);
+        //执行搜索
+        searchRequest.source(sourceBuilder);
+        SearchResponse searchResponse = null;
+        try {
+            searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //解析结果
+        List<Map<String, Object>> list = new ArrayList<>();
+        assert searchResponse != null;
+        for (SearchHit hit : searchResponse.getHits().getHits()) {
+            Map<String, Object> sourceAsMap = hit.getSourceAsMap();
+            Map<String, HighlightField> highlightFields = hit.getHighlightFields();
+            HighlightField highlightField = highlightFields.get(fieldName);
+            if (highlightField != null) {
+                Text[] texts = highlightField.fragments();
+                StringBuilder newHighlightField = new StringBuilder();
+                for (Text text : texts) {
+                    newHighlightField.append(text);
+                }
+                sourceAsMap.put("highlight", newHighlightField.toString());//高亮字段替换掉原来的内容即可
+            }
+            list.add(sourceAsMap);
+        }
+        return list;
+    }
+    public static List<Map<String, Object>> searchRequestByName(String keyword,String index, boolean returnAll,int current, int size,String fieldName) {
+        if (current < 0) {
+            current = 0;
+        }
+        //条件查询
+        SearchRequest searchRequest = new SearchRequest(index);
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+        //分页
+        sourceBuilder.from(current);
+        sourceBuilder.size(size);
+        sourceBuilder.timeout(new TimeValue(60, TimeUnit.SECONDS));
+        // 返回字段
+        if (!returnAll) {
+            String[] includeFields = new String[]{fieldName};
+            String[] excludeFields = new String[]{};
+            sourceBuilder.fetchSource(includeFields, excludeFields);
+        }
+        //match 匹配
+        MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery(fieldName, keyword);
+        sourceBuilder.query(matchQueryBuilder);
         sourceBuilder.timeout(new TimeValue(60, TimeUnit.SECONDS));
         //高亮
         HighlightBuilder highlightBuilder = new HighlightBuilder();
