@@ -16,14 +16,12 @@ import xyz.zhezhi.service.BlogService;
 import xyz.zhezhi.service.CategoryService;
 import xyz.zhezhi.utils.UploadUtils;
 
-import javax.imageio.ImageIO;
-import javax.servlet.http.HttpServletResponse;
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -52,48 +50,54 @@ public class BlogController {
         if (imgFile.isEmpty()) {
             return R.error().message("请上传图片");
         }
-        String format = imgFile.getContentType().split("/")[1];
+        String originalFilename = imgFile.getOriginalFilename();
+        assert originalFilename != null;
+        String format = originalFilename.substring(originalFilename.lastIndexOf("."));
         try {
             // 构建真实的文件路径
-            File userFolder = new File(UploadUtils.getBlogImage() + File.separator + StpUtil.getLoginIdAsString());
+            StringBuilder fileBuilder = new StringBuilder();
+            fileBuilder
+                    .append(UploadUtils.getBlogImage())
+                    .append(StpUtil.getLoginIdAsString())
+            ;
+            File userFolder = new File(fileBuilder.toString());
             if (!userFolder.exists()) {
                 if (!userFolder.mkdirs()) {
                     return R.internal_error();
                 }
             }
-            String imageName = UUID.randomUUID() + "." + format;
-            File newFile = new File(userFolder + File.separator + imageName);
-            // 上传图片到 -》 “绝对路径”
-            imgFile.transferTo(newFile);
-            return R.ok().data("imagePath",
-                    "/blog/getImage/" + StpUtil.getLoginIdAsString() + File.separator + imageName);
+            String fileName = UUID.randomUUID() + format;
+            File severPath = new File(userFolder + File.separator + fileName);
+            // 上传图片到 -> “绝对路径”
+            imgFile.transferTo(severPath);
+            return R.ok().data("imagePath",StpUtil.getLoginIdAsString()+File.separator+ fileName);
         } catch (IOException e) {
             return R.error().message("上传异常");
         }
     }
 
-    @GetMapping("getImage/{id}/{name}")
-    @ApiOperation("获取图片")
-    public void getImage(HttpServletResponse response, @PathVariable("id") String id,
-                         @PathVariable("name") String name) throws IOException {
-        OutputStream os = null;
-        BufferedImage image;
-        try {
-            image = ImageIO.read(new FileInputStream(UploadUtils.getBlogImage() + File.separator + id + File.separator + name));
-            //获取文件的后缀名 jpg
-            String suffix = name.substring(name.lastIndexOf(".") + 1);
-            os = response.getOutputStream();
-            response.setContentType("image/" + suffix);
-            if (image != null) {
-                ImageIO.write(image, suffix, os);
-            }
-        } finally {
-            if (os != null) {
-                os.flush();
-                os.close();
-            }
-        }
-    }
+//    @GetMapping("getImage/{id}/{name}")
+//    @ApiOperation("获取图片")
+//    public void getImage(HttpServletResponse response, @PathVariable("id") String id,
+//                         @PathVariable("name") String name) throws IOException {
+//        OutputStream os = null;
+//        BufferedImage image;
+//        try {
+//            image = ImageIO.read(new FileInputStream(UploadUtils.getBlogImage() + File.separator + id + File.separator + name));
+//            //获取文件的后缀名 jpg
+//            String suffix = name.substring(name.lastIndexOf(".") + 1);
+//            os = response.getOutputStream();
+//            response.setContentType("image/" + suffix);
+//            if (image != null) {
+//                ImageIO.write(image, suffix, os);
+//            }
+//        } finally {
+//            if (os != null) {
+//                os.flush();
+//                os.close();
+//            }
+//        }
+//    }
 
     @GetMapping("getCategories")
     @SaCheckLogin
@@ -184,7 +188,8 @@ public class BlogController {
     }
 
     @GetMapping("queryBlogsByOtherUserId/{current}/{size}/{id}")
-    public R queryBlogsByOtherUserId(@PathVariable("current") Integer current, @PathVariable("size") Integer size,@PathVariable Long id) {
+    public R queryBlogsByOtherUserId(@PathVariable("current") Integer current, @PathVariable("size") Integer size,
+                                     @PathVariable Long id) {
         BlogVO blogVO = blogService.queryBlogPageByOtherUserId(current, size, id);
         return R.ok().data("blog", blogVO);
     }

@@ -19,7 +19,7 @@ import java.io.IOException;
 @Component
 public class GenerateAvatar {
     private static String avatar;
-    @Value("${myconfig.upload.avatar}")
+    @Value("${my-config.file.upload.avatar}")
     public void setAvatar(String avatar) {
         GenerateAvatar.avatar = avatar;
     }

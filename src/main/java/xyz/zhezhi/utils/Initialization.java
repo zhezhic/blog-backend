@@ -8,8 +8,8 @@ import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import xyz.zhezhi.common.ElasticSearchIndex;
-import xyz.zhezhi.module.entity.Upload;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,15 +24,17 @@ import java.util.ArrayList;
  */
 @Slf4j
 public class Initialization {
-    @Autowired
-    Upload upload;
+    @Value("${my-config.file.upload.avatar}")
+    private String avatar;
+    @Value("${my-config.file.upload.blog-image}")
+    private String blogImage;
     @Autowired
     RestHighLevelClient restHighLevelClient;
 
     public void init() throws IOException {
         ArrayList<String> paths = new ArrayList<>();
-        paths.add(upload.getAvatar());
-        paths.add(upload.getBlogImage());
+        paths.add(avatar);
+        paths.add(blogImage);
         for (String path : paths) {
             // 构建上传文件的存放 "文件夹" 路径
             File fileDir = new File(path);

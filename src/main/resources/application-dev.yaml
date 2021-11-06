@@ -1,11 +1,21 @@
 server:
   port: 8087
-myconfig:
-  upload:
-    root: ${user.home}/upload
-    avatar: ${myconfig.upload.root}/avatar/
-    blog: ${myconfig.upload.root}/blog/
-    blog-image: ${myconfig.upload.root}/blog/image
+my-config:
+  file:
+    mapper:
+      avatar: /avatar/**
+      blog-image: /blogImage/**
+    upload:
+      root: ${user.home}/upload/
+      avatar: ${my-config.file.upload.root}avatar/
+      blog: ${my-config.file.upload.root}blog/
+      blog-image: ${my-config.file.upload.blog}image/
+# Spring-Boot 日志输出
+logging:
+  level:
+    root: info
+  file:
+    name: ${my-config.file.upload.root}/blog.log
 spring:
   config:
     activate:
@@ -48,9 +58,4 @@ sa-token:
   token-style: uuid
   # 是否输出操作日志
   is-log: true
-# Spring-Boot 日志输出
-logging:
-  level:
-    root: info
-  file:
-    name: ${myconfig.upload.root}/blog.log
+

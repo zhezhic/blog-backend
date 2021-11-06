@@ -12,19 +12,15 @@ import xyz.zhezhi.common.R;
 import xyz.zhezhi.module.dto.user.UserEditPassword;
 import xyz.zhezhi.module.dto.user.UserLogin;
 import xyz.zhezhi.module.dto.user.UserProfile;
-import xyz.zhezhi.module.entity.Upload;
 import xyz.zhezhi.module.entity.User;
 import xyz.zhezhi.module.vo.UserInfo;
 import xyz.zhezhi.service.UserService;
 import xyz.zhezhi.utils.UploadUtils;
 
-import javax.imageio.ImageIO;
-import javax.servlet.http.HttpServletResponse;
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * @author zhezhi
@@ -38,11 +34,9 @@ import java.io.OutputStream;
 @RequestMapping("/user/")
 public class UserController {
     UserService userService;
-    Upload upload;
 
-    public UserController(UserService userService, Upload upload) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.upload = upload;
     }
 
     @PostMapping("register")
@@ -91,44 +85,32 @@ public class UserController {
         if (imgFile.isEmpty()) {
             return R.error().message("请上传图片");
         }
-        String imgDirFile = UploadUtils.getAvatarPath();
-        String format = imgFile.getContentType().split("/")[1];
+        String originalFilename = imgFile.getOriginalFilename();
+        assert originalFilename != null;
+        String format = originalFilename.substring(originalFilename.lastIndexOf("."));
+        String fileName = StpUtil.getLoginIdAsString()+format;
+        String datePath = new SimpleDateFormat("yyyy/MM/dd/").format(new Date());
         try {
             // 构建真实的文件路径
-            File newFile = new File(imgDirFile + File.separator + StpUtil.getLoginIdAsString() + "." + format);
-            // 上传图片到 -》 “绝对路径”
-            imgFile.transferTo(newFile);
-            String avatarUrl = "http://127.0.0.1:8087/user/getAvatar/" +
-                    StpUtil.getLoginIdAsString() +
-                    "." +
-                    format;
-            userService.setAvatar(StpUtil.getLoginIdAsString(), avatarUrl);
+            StringBuilder fileBuilder = new StringBuilder();
+            fileBuilder
+                    .append(UploadUtils.getAvatarPath()) //头像根路径
+                    .append(datePath) //头像日期文件夹
+            ;
+            File filePath = new File(fileBuilder.toString());
+            if (!filePath.exists()) {
+                if (!filePath.mkdirs()) {
+                    return R.internal_error();
+                }
+            }
+            File absolutePath = new File(fileBuilder.toString(), fileName);
+            // 上传图片到 -> “绝对路径”
+            imgFile.transferTo(absolutePath);
+            userService.setAvatar(StpUtil.getLoginIdAsString(),datePath+ fileName);
             return R.ok().message("上传成功");
         } catch (IOException e) {
             e.printStackTrace();
             return R.error().message("上传异常");
-        }
-    }
-
-    @GetMapping("getAvatar/{name}")
-    @ApiOperation("获取用户头像")
-    public void getAvatar(HttpServletResponse response, @PathVariable("name") String name) throws IOException {
-        OutputStream os = null;
-        BufferedImage image;
-        try {
-            image = ImageIO.read(new FileInputStream(UploadUtils.getAvatarPath() + name));
-            os = response.getOutputStream();
-            //获取文件的后缀名 jpg
-            String suffix = name.substring(name.lastIndexOf(".") + 1);
-            response.setContentType("image/" + suffix);
-            if (image != null) {
-                ImageIO.write(image, suffix, os);
-            }
-        } finally {
-            if (os != null) {
-                os.flush();
-                os.close();
-            }
         }
     }
 

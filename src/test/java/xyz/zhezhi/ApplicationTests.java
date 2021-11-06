@@ -54,8 +54,6 @@ class ApplicationTests {
     @Autowired
     private SayService sayService;
     @Autowired
-    Upload upload;
-    @Autowired
     private RestHighLevelClient restHighLevelClient;
     @Test
     void contextLoads() {
@@ -99,10 +97,7 @@ class ApplicationTests {
         System.err.println("-------");
     }
 
-    @Test
-    void register() throws IOException {
-        System.out.println(upload.getAvatar());
-    }
+
 
     @Test
     void category() {

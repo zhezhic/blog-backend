@@ -7,11 +7,11 @@ import org.springframework.stereotype.Component;
 public class UploadUtils {
     private static String avatar;
     private static String blogImage;
-    @Value("${myconfig.upload.avatar}")
+    @Value("${my-config.file.upload.avatar}")
     public void setAvatar(String avatar) {
         UploadUtils.avatar = avatar;
     }
-    @Value("${myconfig.upload.blog-image}")
+    @Value("${my-config.file.upload.blog-image}")
     public void blogImage(String blogImage) {
         UploadUtils.blogImage = blogImage;
     }
